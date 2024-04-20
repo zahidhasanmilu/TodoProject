@@ -30,20 +30,35 @@ from django.db.models import Q
 # Create your views here.
 
 
-def home(request):   
+def home(request):
     current_user = request.user
     all_task = todo.objects.filter(user=current_user)
     if request.method == "POST":
         name = request.POST.get('todo_name')
-        new_todo = todo(user=request.user,tode_description=name)
+        new_todo = todo(user=request.user, tode_description=name)
         new_todo.save()
         messages.success(request, 'New task created!')
         return redirect('home')
-    
-    context={
-        'all_task':all_task
+
+    context = {
+        'all_task': all_task
     }
-    return render(request, 'todoapp/todo.html',context)
+    return render(request, 'todoapp/todo.html', context)
+
+
+def upadate_task(request, id):
+    task = todo.objects.get(user=request.user, id=id)
+    task.status = True
+    task.save()
+    messages.success(request, 'task updated')
+    return redirect(home)
+
+
+def delete_task(request, id):
+    task = todo.objects.get(user=request.user, id=id)
+    task.delete()
+    messages.success(request, 'task Deleted!!')
+    return redirect(home)
 
 
 def register(request):
@@ -95,6 +110,7 @@ def login_page(request):
             messages.error(request, 'Password Not Matched!!')
             return redirect('login')
     return render(request, 'todoapp/login.html')
+
 
 def logout_page(request):
     logout(request)
