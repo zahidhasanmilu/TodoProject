@@ -29,7 +29,7 @@ from django.db.models import Q
 
 # Create your views here.
 
-
+@login_required
 def home(request):
     current_user = request.user
     all_task = todo.objects.filter(user=current_user)
@@ -45,7 +45,7 @@ def home(request):
     }
     return render(request, 'todoapp/todo.html', context)
 
-
+@login_required
 def upadate_task(request, id):
     task = todo.objects.get(user=request.user, id=id)
     task.status = True
@@ -53,7 +53,7 @@ def upadate_task(request, id):
     messages.success(request, 'task updated')
     return redirect(home)
 
-
+@login_required
 def delete_task(request, id):
     task = todo.objects.get(user=request.user, id=id)
     task.delete()
@@ -98,7 +98,7 @@ def login_page(request):
         password = request.POST.get('password')
 
         if not User.objects.filter(username=name).exists():
-            messages.error(request, 'user not available')
+            messages.error(request, 'Please input your valid Username')
             return redirect('login')
 
         user = authenticate(username=name, password=password)
@@ -107,11 +107,12 @@ def login_page(request):
             messages.success(request, 'User logged in successfully')
             return redirect('home')
         else:
-            messages.error(request, 'Password Not Matched!!')
+            messages.error(request, 'Password incorrect!')
             return redirect('login')
     return render(request, 'todoapp/login.html')
 
 
+@login_required
 def logout_page(request):
     logout(request)
     messages.error(request, 'Logout successfull, please login here!')
